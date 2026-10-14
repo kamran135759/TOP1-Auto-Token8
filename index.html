@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d1b">
+<title>TOP1 Auto Token Studio</title>
+
+<style>
+:root {
+  --bg:#080d1b;
+  --panel:#111a2e;
+  --line:#263653;
+  --text:#edf4ff;
+  --muted:#9cacc8;
+  --blue:#35b9ff;
+  --green:#28dba0;
+  --red:#ff7272;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:linear-gradient(145deg,#080d1b,#101a32);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  line-height:1.5;
+}
+header {
+  padding:25px 16px;
+  text-align:center;
+  border-bottom:1px solid var(--line);
+}
+.logo {
+  width:64px;height:64px;
+  margin:auto auto 12px;
+  display:grid;place-items:center;
+  font-size:32px;font-weight:bold;
+  color:#061020;
+  background:linear-gradient(135deg,#44d4ff,#6685ff);
+  clip-path:polygon(50% 0,100% 100%,0 100%);
+  padding-top:12px;
+}
+h1 { margin:5px 0;font-size:25px; }
+header p,.muted { color:var(--muted);font-size:13px; }
+main { max-width:760px;margin:auto;padding:15px; }
+.card {
+  background:rgba(17,26,46,.96);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:17px;
+  margin-bottom:15px;
+}
+h2 { font-size:18px;margin:0 0 13px; }
+label {
+  display:block;
+  font-size:13px;
+  color:#c5d4ee;
+  margin:12px 0 6px;
+}
+input,select,textarea {
+  display:block;width:100%;
+  color:var(--text);
+  background:#080f20;
+  border:1px solid #30415f;
+  border-radius:9px;
+  padding:12px;
+  font-size:15px;
+  outline:none;
+}
+input:focus,textarea:focus {
+  border-color:var(--blue);
+}
+button {
+  border:0;border-radius:10px;
+  padding:12px 14px;
+  font-size:14px;font-weight:bold;
+  cursor:pointer;
+  background:var(--blue);
+  color:#04101d;
+}
+button:disabled { opacity:.5;cursor:not-allowed; }
+button.secondary {
+  color:var(--text);
+  background:#263653;
+  border:1px solid #3b4e70;
+}
+button.green { background:var(--green); }
+button.red { background:#5a2837;color:#fff; }
+.buttons {
+  display:flex;gap:8px;flex-wrap:wrap;
+  margin-top:12px;
+}
+.buttons button { flex:1 1 140px; }
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.status {
+  background:#080f20;
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:12px;
+  margin-top:10px;
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+.status.ok { border-color:#168d6b;color:#9affd9; }
+.status.err { border-color:#a34353;color:#ffb5bd; }
+pre {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  background:#050a14;
+  color:#b9f5d6;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:13px;
+  max-height:440px;
+  overflow:auto;
+  font-size:12px;
+}
+.small { font-size:12px;color:var(--muted); }
+a { color:var(--blue);overflow-wrap:anywhere; }
+hr { border:0;border-top:1px solid var(--line);margin:16px 0; }
+footer { text-align:center;padding:20px;color:var(--muted);font-size:12px; }
+@media(max-width:440px) {
+  .grid { grid-template-columns:1fr; }
+  header { padding:20px 12px; }
+  main { padding:10px; }
+  .card { padding:14px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">1</div>
+  <h1>TOP1 Auto Token Studio</h1>
+  <p>Create Solidity source · Connect wallet · Read token details</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>01 — Start & Wallet</h2>
+    <p class="muted">Connect a compatible wallet to read your account and existing token.</p>
+    <div class="buttons">
+      <button id="startBtn">START</button>
+      <button id="connectBtn" class="secondary">CONNECT WALLET</button>
+    </div>
+    <div id="walletStatus" class="status">Wallet not connected.</div>
+    <div class="buttons">
+      <button id="checkWalletBtn" class="secondary">CHECK WALLET</button>
+      <button id="switchBtn" class="secondary">CHECK BNB NETWORK</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>02 — New Token Configuration</h2>
+    <p class="muted">These settings are only for generating a new Solidity file. They do not modify an already deployed token.</p>
+
+    <label for="tokenName">Token name</label>
+    <input id="tokenName" value="TOP1" maxlength="40">
+
+    <label for="tokenSymbol">Token symbol</label>
+    <input id="tokenSymbol" value="TOP1" maxlength="12">
+
+    <div class="grid">
+      <div>
+        <label for="decimals">Decimals</label>
+        <select id="decimals">
+          <option value="18" selected>18</option>
+          <option value="8">8</option>
+          <option value="6">6</option>
+          <option value="0">0</option>
+        </select>
+      </div>
+      <div>
+        <label for="supply">Whole token supply</label>
+        <input id="supply" type="number" min="1" max="1000000000000000000" step="1" value="1000000">
+      </div>
+    </div>
+
+    <div class="buttons">
+      <button id="minusBtn" class="secondary">− 1,000,000</button>
+      <button id="plusBtn" class="secondary">+ 1,000,000</button>
+    </div>
+
+    <div id="supplyStatus" class="status">Supply: 1,000,000 tokens</div>
+
+    <div class="buttons">
+      <button id="generateBtn" class="green">GENERATE CONTRACT</button>
+      <button id="copyBtn" class="secondary">COPY SOLIDITY CODE</button>
+      <button id="saveBtn" class="secondary">SAVE .SOL FILE</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>03 — Generated Solidity Source</h2>
+    <p class="muted">Review the code before using Remix to compile and deploy it.</p>
+    <pre id="contractOutput">// Press GENERATE CONTRACT to create the source code.</pre>
+    <div id="generateStatus" class="status">No contract generated yet.</div>
+  </section>
+
+  <section class="card">
+    <h2>04 — Read Existing Token</h2>
+    <p class="muted">Paste the address of a deployed token on BNB Smart Chain. This section reads public contract data; it does not deploy or change the token.</p>
+
+    <label for="contractAddress">Contract address</label>
+    <input id="contractAddress"
+      value="0x67299d18D1c78e591DDBa95d10148fa5644b8f7D"
+      placeholder="0x...">
+
+    <div class="buttons">
+      <button id="readBtn">READ TOKEN</button>
+      <button id="bscScanBtn" class="secondary">OPEN BSCSCAN</button>
+    </div>
+
+    <div id="contractStatus" class="status">Not read yet.</div>
+    <div id="tokenDetails" class="status">Token details will appear here.</div>
+  </section>
+
+  <section class="card">
+    <h2>05 — Remix Deployment</h2>
+    <p class="muted">The app generates source code only. To deploy a new token, open Remix, compile the Solidity file, select the compatible injected wallet provider, and review the network and transaction before confirming.</p>
+    <div class="buttons">
+      <button id="remixBtn">OPEN REMIX</button>
+      <button id="bscBtn" class="secondary">OPEN BNB EXPLORER</button>
+    </div>
+    <p class="small">Never enter your seed phrase or private key into this site.</p>
+  </section>
+</main>
+
+<footer>TOP1 Auto Token Studio · Use at your own risk · No deployment performed by this page</footer>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+const DEFAULT_ADDRESS = "0x67299d18D1C78e591DDBa95d10148fa5644b8f7D";
+const BSC_CHAIN_ID = "0x38";
+
+let generatedSource = "";
+let provider = null;
+let signer = null;
+let walletAddress = "";
+
+function setStatus(id, message, type = "") {
+  const el = $(id);
+  el.textContent = message;
+  el.className = "status" + (type ? " " + type : "");
+}
+
+function escapeSolidityString(value) {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
+function getConfig() {
+  const name = $("tokenName").value.trim();
+  const symbol = $("tokenSymbol").value.trim();
+  const decimals = Number($("decimals").value);
+  const supplyText = $("supply").value.trim();
+
+  if (!name || name.length > 40) {
+    throw new Error("Enter a token name with 1–40 characters.");
+  }
+  if (!/^[A-Za-z0-9_-]{1,12}$/.test(symbol)) {
+    throw new Error("Symbol must be 1–12 letters, numbers, underscores or hyphens.");
+  }
+  if (![0, 6, 8, 18].includes(decimals)) {
+    throw new Error("Unsupported decimals setting.");
+  }
+  if (!/^[0-9]+$/.test(supplyText)) {
+    throw new Error("Supply must be a whole positive number.");
+  }
+
+  const supply = BigInt(supplyText);
+  if (supply < 1n || supply > 1000000000000000000n) {
+    throw new Error("Supply must be between 1 and 1,000,000,000,000,000,000.");
+  }
+
+  const rawSupply = supply * (10n ** BigInt(decimals));
+  return { name, symbol, decimals, supply, rawSupply };
+}
+
+function buildContract(c) {
+  const safeName = escapeSolidityString(c.name);
+  const safeSymbol = escapeSolidityString(c.symbol);
+
+  return `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+/*
+ * Generated by TOP1 Auto Token Studio.
+ * Fixed supply: no mint function.
+ * Review and test before deployment.
+ */
+contract TOP1GeneratedToken {
+    string public constant name = "${safeName}";
+    string public constant symbol = "${safeSymbol}";
+    uint8 public constant decimals = ${c.decimals};
+    uint256 public constant totalSupply = ${c.rawSupply};
+
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    constructor() {
+        balanceOf[msg.sender] = totalSupply;
+        emit Transfer(address(0), msg.sender, totalSupply);
+    }
+
+    function transfer(address to, uint256 value) external returns (bool) {
+        require(to != address(0), "Invalid recipient");
+        require(balanceOf[msg.sender] >= value, "Insufficient balance");
+        balanceOf[msg.sender] -= value;
+        balanceOf[to] += value;
+        emit Transfer(msg.sender, to, value);
+        return true;
+    }
+
+    function approve(address spender, uint256 value) external returns (bool) {
+        require(spender != address(0), "Invalid spender");
+        allowance[msg.sender][spender] = value;
+        emit Approval(msg.sender, spender, value);
+        return true;
+    }
+
+    function transferFrom(address from, address to, uint256 value) external returns (bool) {
+        require(from != address(0) && to != address(0), "Invalid address");
+        require(balanceOf[from] >= value, "Insufficient balance");
+        uint256 allowed = allowance[from][msg.sender];
+        require(allowed >= value, "Allowance exceeded");
+
+        if (allowed != type(uint256).max) {
+            allowance[from][msg.sender] = allowed - value;
+        }
+
+        balanceOf[from] -= value;
+        balanceOf[to] += value;
+        emit Transfer(from, to, value);
+        return true;
+    }
+}
+`;
+}
+
+function generateContract() {
+  try {
+    const config = getConfig();
+    generatedSource = buildContract(config);
+    $("contractOutput").textContent = generatedSource;
+    setStatus(
+      "generateStatus",
+      "Contract source generated. Supply: " +
+      config.supply.toLocaleString("en-US") +
+      " tokens. Not deployed.",
+      "ok"
+    );
+    updateSupplyStatus();
+  } catch (error) {
+    setStatus("generateStatus", error.message, "err");
+  }
+}
+
+function updateSupplyStatus() {
+  try {
+    const c = getConfig();
+    setStatus(
+      "supplyStatus",
+      "Whole supply: " + c.supply.toLocaleString("en-US") +
+      " | Raw units: " + c.rawSupply.toString(),
+      "ok"
+    );
+  } catch (error) {
+    setStatus("supplyStatus", error.message, "err");
+  }
+}
+
+async function copySource() {
+  if (!generatedSource) generateContract();
+  if (!generatedSource) return;
+
+  try {
+    await navigator.clipboard.writeText(generatedSource);
+    setStatus("generateStatus", "Solidity source copied.", "ok");
+  } catch (error) {
+    const area = document.createElement("textarea");
+    area.value = generatedSource;
+    document.body.appendChild(area);
+    area.select();
+    const copied = document.execCommand("copy");
+    area.remove();
+    setStatus(
+      "generateStatus",
+      copied ? "Solidity source copied." : "Copy failed. Select and copy the code manually.",
+      copied ? "ok" : "err"
+    );
+  }
+}
+
+function saveSource() {
+  if (!generatedSource) generateContract();
+  if (!generatedSource) return;
+
+  const blob = new Blob([generatedSource], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "TOP1GeneratedToken.sol";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function connectWallet() {
+  if (!window.ethereum) {
+    setStatus(
+      "walletStatus",
+      "No injected wallet found. Open this page in a compatible wallet browser. This version does not use WalletConnect.",
+      "err"
+    );
+    return;
+  }
+
+  try {
+    const accounts = await window.ethereum.request({
+      method:"eth_requestAccounts"
+    });
+
+    if (!accounts || !accounts.length) throw new Error("No wallet account returned.");
+
+    walletAddress = accounts[0];
+    const chainId = await window.ethereum.request({method:"eth_chainId"});
+
+    setStatus(
+      "walletStatus",
+      "Connected: " + walletAddress + " | Chain ID: " + chainId,
+      "ok"
+    );
+  } catch (error) {
+    setStatus("walletStatus", error.message || "Wallet connection rejected.", "err");
+  }
+}
+
+async function checkWallet() {
+  if (!window.ethereum) {
+    setStatus("walletStatus", "No injected wallet provider detected.", "err");
+    return;
+  }
+
+  try {
+    const accounts = await window.ethereum.request({method:"eth_accounts"});
+    const chainId = await window.ethereum.request({method:"eth_chainId"});
+    walletAddress = accounts && accounts.length ? accounts[0] : "";
+
+    setStatus(
+      "walletStatus",
+      (walletAddress ? "Account: " + walletAddress : "Wallet is not connected.") +
+      " | Chain ID: " + chainId,
+      walletAddress ? "ok" : ""
+    );
+  } catch (error) {
+    setStatus("walletStatus", error.message || "Could not check wallet.", "err");
+  }
+}
+
+async function checkNetwork() {
+  if (!window.ethereum) {
+    setStatus("walletStatus", "No injected wallet provider detected.", "err");
+    return;
+  }
+
+  try {
+    const chainId = await window.ethereum.request({method:"eth_chainId"});
+    if (chainId.toLowerCase() === BSC_CHAIN_ID) {
+      setStatus("walletStatus", "Wallet is on BNB Smart Chain Mainnet (Chain ID 56).", "ok");
+    } else {
+      setStatus(
+        "walletStatus",
+        "Current Chain ID: " + chainId + ". BNB Smart Chain Mainnet uses Chain ID 56.",
+        "err"
+      );
+    }
+  } catch (error) {
+    setStatus("walletStatus", error.message || "Network check failed.", "err");
+  }
+}
+
+function validAddress(value) {
+  return /^0x[a-fA-F0-9]{40}$/.test(value.trim());
+}
+
+function getRpcProvider() {
+  if (!window.ethers) {
+    throw new Error("Ethers library did not load. Check internet access and reload.");
+  }
+  return new ethers.JsonRpcProvider("https://bsc-dataseed.binance.org/");
+}
+
+async function readToken() {
+  const address = $("contractAddress").value.trim();
+
+  if (!validAddress(address)) {
+    setStatus("contractStatus", "Enter a valid 0x contract address.", "err");
+    return;
+  }
+
+  const abi = [
+    "function name() view returns (string)",
+    "function symbol() view returns (string)",
+    "function decimals() view returns (uint8)",
+    "function totalSupply() view returns (uint256)",
+    "function balanceOf(address) view returns (uint256)"
+  ];
+
+  try {
+    if (!window.ethers) {
+      throw new Error("Ethers library did not load. Check internet access and reload.");
+    }
+
+    const rpc = getRpcProvider();
+    const network = await rpc.getNetwork();
+
+    if (network.chainId !== 56n) {
+      throw new Error("RPC is not connected to BNB Smart Chain.");
+    }
+
+    const code = await rpc.getCode(address);
+    if (code === "0x") {
+      throw new Error("No contract bytecode found at this address on BNB Smart Chain.");
+    }
+
+    const contract = new ethers.Contract(address, abi, rpc);
+
+    const [name, symbol, decimals, totalSupply] = await Promise.all([
+      contract.name(),
+      contract.symbol(),
+      contract.decimals(),
+      contract.totalSupply()
+    ]);
+
+    let balanceText = "Connect a wallet to read its token balance.";
+    if (walletAddress) {
+      try {
+        const balance = await contract.balanceOf(walletAddress);
+        balanceText = "Connected wallet balance: " +
+          ethers.formatUnits(balance, decimals) + " " + symbol;
+      } catch (_) {
+        balanceText = "Could not read connected wallet balance.";
+      }
+    }
+
+    $("tokenDetails").textContent =
+      "Name: " + name + "\n" +
+      "Symbol: " + symbol + "\n" +
+      "Decimals: " + decimals + "\n" +
+      "Total supply: " + ethers.formatUnits(totalSupply, decimals) + "\n" +
+      balanceText;
+
+    setStatus("contractStatus", "Token information read from BNB Smart Chain.", "ok");
+  } catch (error) {
+    setStatus(
+      "contractStatus",
+      error.message || "Could not read contract. Check the address and network.",
+      "err"
+    );
+  }
+}
+
+function openBscScan() {
+  const address = $("contractAddress").value.trim();
+  if (!validAddress(address)) {
+    setStatus("contractStatus", "Enter a valid contract address first.", "err");
+    return;
+  }
+  window.open(
+    "https://bscscan.com/address/" + encodeURIComponent(address),
+    "_blank",
+    "noopener"
+  );
+}
+
+$("startBtn").addEventListener("click", () => {
+  generateContract();
+  $("tokenName").focus();
+});
+
+$("connectBtn").addEventListener("click", connectWallet);
+$("checkWalletBtn").addEventListener("click", checkWallet);
+$("switchBtn").addEventListener("click", checkNetwork);
+$("generateBtn").addEventListener("click", generateContract);
+$("copyBtn").addEventListener("click", copySource);
+$("saveBtn").addEventListener("click", saveSource);
+$("readBtn").addEventListener("click", readToken);
+$("bscScanBtn").addEventListener("click", openBscScan);
+
+$("plusBtn").addEventListener("click", () => {
+  const input = $("supply");
+  const current = BigInt(input.value || "0");
+  input.value = (current + 1000000n).toString();
+  updateSupplyStatus();
+});
+
+$("minusBtn").addEventListener("click", () => {
+  const input = $("supply");
+  const current = BigInt(input.value || "0");
+  input.value = (current > 1000000n ? current - 1000000n : 1n).toString();
+  updateSupplyStatus();
+});
+
+["tokenName","tokenSymbol","decimals","supply"].forEach(id => {
+  $(id).addEventListener("input", updateSupplyStatus);
+  $(id).addEventListener("change", updateSupplyStatus);
+});
+
+$("remixBtn").addEventListener("click", () => {
+  window.open("https://remix.ethereum.org/", "_blank", "noopener");
+});
+
+$("bscBtn").addEventListener("click", () => {
+  window.open("https://bscscan.com/", "_blank", "noopener");
+});
+
+if (window.ethereum) {
+  window.ethereum.on?.("accountsChanged", accounts => {
+    walletAddress = accounts && accounts.length ? accounts[0] : "";
+    setStatus(
+      "walletStatus",
+      walletAddress ? "Account changed: " + walletAddress : "Wallet disconnected.",
+      walletAddress ? "ok" : ""
+    );
+  });
+
+  window.ethereum.on?.("chainChanged", chainId => {
+    setStatus("walletStatus", "Network changed. Chain ID: " + chainId);
+  });
+}
+
+updateSupplyStatus();
+</script>
+
+<script
+  src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"
+  crossorigin="anonymous">
+</script>
+</body>
+  </html>
